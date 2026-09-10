@@ -28,3 +28,5 @@ Used Claude Code to set up frontend with TypeScript, React and Vite.
 Used Claude Code to set up Docker Compose file that has one service for backend, one service for the frontend. This way another developer can simply run backend and frontend without any project specific dependencies installed, besides Docker.
 
 Had problems with file permissions and Gradle setup in order to show declarations in IDEA properly. Used Claude Code to resolve these issues.
+
+Used Claude Code to create basic front page for the project's website that shows a banner with a featured book. Above the banner, there's a search bar for books. Didn't implement any functionality yet, just focused on simple layout and that it looks like a basis for an online store.
