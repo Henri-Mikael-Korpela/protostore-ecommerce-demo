@@ -7,6 +7,14 @@ The development proces was aided by AI tools like Claude Code to speed up busy w
 
 - Docker (tested on version 29.7.2)
 
+Before the first `docker compose up`, create a local `.env` file (gitignored,
+one per machine) so containers write files as your own user instead of root:
+
+```
+echo "UID=$(id -u)" > .env
+echo "GID=$(id -g)" >> .env
+```
+
 ## Development Process
 
 ### Day 1: Basics

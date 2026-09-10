@@ -1,15 +1,23 @@
 FROM eclipse-temurin:17-jdk
 
+ARG UID=1000
+ARG GID=1000
+
 RUN apt-get update && apt-get install -y --no-install-recommends entr \
-	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/* \
+	&& groupadd -g "$GID" app \
+	&& useradd -m -u "$UID" -g "$GID" app
 
 WORKDIR /app
+RUN chown app:app /app
 
-COPY gradlew settings.gradle build.gradle ./
-COPY gradle gradle
+USER app
+
+COPY --chown=app:app gradlew settings.gradle build.gradle ./
+COPY --chown=app:app gradle gradle
 RUN ./gradlew --version
 
-COPY . .
+COPY --chown=app:app . .
 
 EXPOSE 8080
 
