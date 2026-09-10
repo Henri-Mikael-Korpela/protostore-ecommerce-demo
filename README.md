@@ -26,3 +26,5 @@ Used Claude Code to set up backend with Java and Spring Boot with simple HTTP ba
 Used Claude Code to set up frontend with TypeScript, React and Vite.
 
 Used Claude Code to set up Docker Compose file that has one service for backend, one service for the frontend. This way another developer can simply run backend and frontend without any project specific dependencies installed, besides Docker.
+
+Had problems with file permissions and Gradle setup in order to show declarations in IDEA properly. Used Claude Code to resolve these issues.
