@@ -9,8 +9,7 @@ public class BooksController {
 
 	@GetMapping("/api/books")
 	public Book[] getBooks() {
-		Book[] books = { new Book("9781098151331", "Learning Systems Thinking") };
-		return books;
+        return new Book[]{ new Book("9781098151331", "Learning Systems Thinking") };
 	}
 
 }
