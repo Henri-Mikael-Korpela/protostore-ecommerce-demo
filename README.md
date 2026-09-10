@@ -7,4 +7,4 @@ The development proces was aided by AI tools like Claude Code to speed up busy w
 
 ## Day 1: Basics
 
-Used Claude Code to set up Java and Spring Boot with simple HTTP backend. AI reduced mundane configuration time.
+Used Claude Code to set up backend with Java and Spring Boot with simple HTTP backend. AI reduced mundane configuration time.
