@@ -10,6 +10,7 @@ build/
 .idea/*
 !.idea/runConfigurations/
 !.idea/gradle.xml
+!.idea/vcs.xml
 *.iws
 *.iml
 *.ipr
