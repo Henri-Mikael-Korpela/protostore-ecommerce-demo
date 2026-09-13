@@ -7,6 +7,13 @@ The development proces was aided by AI tools like Claude Code to speed up busy w
 
 - Docker (tested on version 29.7.2)
 
+Everything runs through `docker compose up`, so Docker is the only hard
+requirement. For running or debugging the backend outside of Docker (like
+`./gradlew bootRun` from an IDE), you'll also need:
+
+- JDK 17 (the backend's Docker image also uses `eclipse-temurin:17-jdk`).
+- Gradle 8.14.3, which is not installed separately. The repo ships the Gradle wrapper (`./gradlew`).
+
 Before the first `docker compose up`, create a local `.env` file (gitignored,
 one per machine) so containers write files as your own user instead of root:
 
