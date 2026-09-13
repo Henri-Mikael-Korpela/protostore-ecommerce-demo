@@ -18,10 +18,38 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.flywaydb:flyway-core'
+
+	// From Flyway v10 onwards, PostgreSQL support was split into its own module.
+	// Necessary to recognize PostgreSQL dialect.
+	implementation 'org.flywaydb:flyway-database-postgresql'
+
+	// The JDBC driver both Flyway and Hibernate require at runtime
+	implementation 'org.postgresql:postgresql'
+
+	// Standard choice for typical CRUD-heavy applications.
+	// Repository interface helps with query creation.
+	// Good integration with transactions and validation.
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Lets `./gradlew bootRun` connect to the `db` service from docker-compose.yml
+// using the same credentials docker-compose itself reads from .env, instead of
+// relying on the fallback defaults in application.properties.
+tasks.named('bootRun') {
+	def envFile = file('../.env')
+	if (envFile.exists()) {
+		def env = new Properties()
+		envFile.withInputStream { env.load(it) }
+		environment 'SPRING_DATASOURCE_URL', "jdbc:postgresql://localhost:${env.getProperty('DB_PORT_TO_HOST', '5433')}/${env.getProperty('DB_NAME', 'prostore')}"
+		environment 'SPRING_DATASOURCE_USERNAME', env.getProperty('DB_USER', 'prostore')
+		environment 'SPRING_DATASOURCE_PASSWORD', env.getProperty('DB_PASSWORD', 'prostore')
+	}
 }

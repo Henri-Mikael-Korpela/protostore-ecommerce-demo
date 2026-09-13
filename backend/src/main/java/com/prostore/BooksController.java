@@ -1,5 +1,6 @@
 package com.prostore;
 
+import com.prostore.repository.BookRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.prostore.dto.Book;
@@ -7,9 +8,18 @@ import com.prostore.dto.Book;
 @RestController
 public class BooksController {
 
+	private final BookRepository bookRepository;
+
+	public BooksController(BookRepository bookRepository) {
+		this.bookRepository = bookRepository;
+	}
+
 	@GetMapping("/api/books")
 	public Book[] getBooks() {
-        return new Book[]{ new Book("9781098151331", "Learning Systems Thinking") };
+		return bookRepository.findAll()
+				.stream()
+				.map(book -> new Book(book.getIsbn(), book.getTitle()))
+				.toArray(Book[]::new);
 	}
 
 }

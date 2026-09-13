@@ -5,11 +5,31 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-prostore}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-prostore}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-prostore}
     ports:
       - "8080:8080"
     volumes:
       - ./backend:/app
       - backend-gradle-cache:/home/app/.gradle
+
+  db:
+    # Postgres 18+ required since UUID v7 is used
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-prostore}
+      POSTGRES_USER: ${DB_USER:-prostore}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    ports:
+      - "${DB_PORT_TO_HOST:-5433}:5432"
+    volumes:
+      # Postgres 18+ images expect a single mount at /var/lib/postgresql (not
+      # .../data) so they can lay out major-version-specific data directories.
+      - db-data:/var/lib/postgresql
 
   frontend:
     build:
@@ -27,4 +47,5 @@ services:
 
 volumes:
   backend-gradle-cache:
+  db-data:
   frontend-node-modules:

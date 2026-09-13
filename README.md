@@ -10,7 +10,7 @@ The development proces was aided by AI tools like Claude Code to speed up busy w
 Before the first `docker compose up`, create a local `.env` file (gitignored,
 one per machine) so containers write files as your own user instead of root:
 
-```
+```shell
 echo "UID=$(id -u)" > .env
 echo "GID=$(id -g)" >> .env
 ```
@@ -30,3 +30,19 @@ Used Claude Code to set up Docker Compose file that has one service for backend,
 Had problems with file permissions and Gradle setup in order to show declarations in IDEA properly. Used Claude Code to resolve these issues.
 
 Used Claude Code to create basic front page for the project's website that shows a banner with a featured book. Above the banner, there's a search bar for books. Didn't implement any functionality yet, just focused on simple layout and that it looks like a basis for an online store.
+
+### Day 2: Database Integration
+
+Went from "no database" to "Spring Boot talking to Postgres in Docker".
+
+Set up JPA for Spring and installed Flyway dependency. Wrote down notes.
+
+Created the first migration for initializing a book table. Created a book entity the match the creation query in the migration.
+
+Fixed some incompatibilities between Gradle and Postgres versions.
+
+Topics to learn more about later:
+
+- UUID and its different versions (v7 seems to be a good modern version)
+- PostgreSQL: Operator `~` with regex string
+- Java: Constructor method reference
