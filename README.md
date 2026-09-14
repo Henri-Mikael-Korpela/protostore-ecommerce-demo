@@ -53,3 +53,7 @@ Topics to learn more about later:
 - UUID and its different versions (v7 seems to be a good modern version)
 - PostgreSQL: Operator `~` with regex string
 - Java: Constructor method reference
+
+### Day 3: Adding unit tests
+
+Added one unit test to test the GET /api/books endpoint.
