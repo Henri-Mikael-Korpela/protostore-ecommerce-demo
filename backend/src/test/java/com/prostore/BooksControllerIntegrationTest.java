@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +41,27 @@ class BooksControllerIntegrationTest {
                     "$[*].title",
                     containsInAnyOrder("Clean Code", "Effective Java")
                 ));
+    }
+
+    @Test
+    @Sql("/testdata/books-basic.sql")
+    void getBooks_returnsBooksSeededFromFixtureBySearchParamWhenNameMatches() throws Exception {
+        mockMvc.perform(get("/api/books")
+                .param("search", "Effective")
+            )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].title").value("Effective Java"));
+    }
+
+    @Test
+    @Sql("/testdata/books-basic.sql")
+    void getBooks_returnsNoBooksSeededFromFixtureBySearchParamWhenNameDoesNotMatch() throws Exception {
+        mockMvc.perform(get("/api/books")
+                        .param("search", "Non-existent")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test

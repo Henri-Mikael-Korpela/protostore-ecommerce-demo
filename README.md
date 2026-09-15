@@ -22,6 +22,8 @@ echo "UID=$(id -u)" > .env
 echo "GID=$(id -g)" >> .env
 ```
 
+## Design
+
 ## Development Process
 
 ### Day 1: Basics
@@ -69,3 +71,5 @@ Topics to learn more about later:
 Added SQL testdata containing some test books. Used Claude Code to set up Testcontainers to utilize multiple test datum.
 
 Configured test runner to use GRADLE insteaad of PLATFORM, which is IntelliJ's built-in JUnit runner.
+
+Added query parameter `search` to the books endpoint to search for books containing the search value (case-insensitive).
