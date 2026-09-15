@@ -57,3 +57,15 @@ Topics to learn more about later:
 ### Day 3: Adding unit tests
 
 Added one unit test to test the GET /api/books endpoint.
+
+Topics to learn more about later:
+
+- Spring dependency injection and @Autowired
+- ./gradlew test
+- ./gradlew dependencies
+
+## Day 4: Adding SQL testdata
+
+Added SQL testdata containing some test books. Used Claude Code to set up Testcontainers to utilize multiple test datum.
+
+Configured test runner to use GRADLE insteaad of PLATFORM, which is IntelliJ's built-in JUnit runner.

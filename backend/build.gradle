@@ -36,20 +36,28 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-// Lets `./gradlew bootRun` connect to the `db` service from docker-compose.yml
-// using the same credentials docker-compose itself reads from .env, instead of
+// Reads docker-compose's .env so both `bootRun` and `test` connect to the same
+// `db` service (see docker-compose.yml) with its real credentials, instead of
 // relying on the fallback defaults in application.properties.
-tasks.named('bootRun') {
+def configureDatasourceFromEnvFile = { task ->
 	def envFile = file('../.env')
 	if (envFile.exists()) {
 		def env = new Properties()
 		envFile.withInputStream { env.load(it) }
-		environment 'SPRING_DATASOURCE_URL', "jdbc:postgresql://localhost:${env.getProperty('DB_PORT_TO_HOST', '5433')}/${env.getProperty('DB_NAME', 'prostore')}"
-		environment 'SPRING_DATASOURCE_USERNAME', env.getProperty('DB_USER', 'prostore')
-		environment 'SPRING_DATASOURCE_PASSWORD', env.getProperty('DB_PASSWORD', 'prostore')
+		task.environment 'SPRING_DATASOURCE_URL', "jdbc:postgresql://localhost:${env.getProperty('DB_PORT_TO_HOST', '5433')}/${env.getProperty('DB_NAME', 'prostore')}"
+		task.environment 'SPRING_DATASOURCE_USERNAME', env.getProperty('DB_USER', 'prostore')
+		task.environment 'SPRING_DATASOURCE_PASSWORD', env.getProperty('DB_PASSWORD', 'prostore')
 	}
+}
+
+tasks.named('bootRun') {
+	configureDatasourceFromEnvFile(it)
+}
+
+// BooksControllerIntegrationTest needs a real Postgres to run Flyway migrations
+// and testdata fixtures against; it connects to the docker-compose `db` service
+// the same way `bootRun` does. Run `docker compose up db` first.
+tasks.named('test') {
+	useJUnitPlatform()
+	configureDatasourceFromEnvFile(it)
 }
