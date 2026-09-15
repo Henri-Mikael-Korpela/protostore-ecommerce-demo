@@ -22,8 +22,6 @@ echo "UID=$(id -u)" > .env
 echo "GID=$(id -g)" >> .env
 ```
 
-## Design
-
 ## Development Process
 
 ### Day 1: Basics
@@ -66,10 +64,16 @@ Topics to learn more about later:
 - ./gradlew test
 - ./gradlew dependencies
 
-## Day 4: Adding SQL testdata
+## Day 4: Adding SQL testdata, Book Search Improvements
 
 Added SQL testdata containing some test books. Used Claude Code to set up Testcontainers to utilize multiple test datum.
 
 Configured test runner to use GRADLE insteaad of PLATFORM, which is IntelliJ's built-in JUnit runner.
 
 Added query parameter `search` to the books endpoint to search for books containing the search value (case-insensitive).
+
+Using Claude Code, implemented a basis for full-text search for books.
+
+Topics to learn more about later:
+
+- Information retrieval (IR), specifically a hybrid lexical + semantic search

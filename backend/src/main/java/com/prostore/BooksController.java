@@ -20,7 +20,7 @@ public class BooksController {
 		@RequestParam(required = false) String search
    	) {
 		var books = (search != null)
-			? bookRepository.findByTitleContainingIgnoreCase(search)
+			? bookRepository.searchByTitle(search)
 			: bookRepository.findAll();
 
 		return books.stream()

@@ -82,6 +82,21 @@ class BooksControllerIntegrationTest {
     }
 
     @Test
+    @Sql("/testdata/books-many.sql")
+    void getBooks_returnsBooksFromLargerFixtureByName2() throws Exception {
+        mockMvc.perform(
+            get("/api/books").param("search", "java effective")
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(
+                        "$[*].title",
+                        containsInAnyOrder(
+                                "Effective Java"
+                        )
+                ));
+    }
+
+    @Test
     @Sql("/testdata/books-with-null-isbn.sql")
     void getBooks_handlesBookWithoutIsbn() throws Exception {
         mockMvc.perform(get("/api/books"))
