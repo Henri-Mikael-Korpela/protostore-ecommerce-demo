@@ -58,7 +58,7 @@ export type EndpointResponseAwaited<N extends EndpointName> = Awaited<ReturnType
 
 /// Project specific API endpoints
 
-export const getBooks = async function(search: string): Promise<BookDto[]> {
+export async function getBooks(search: string): Promise<BookDto[]> {
     try {
         return await buildApiRequest({
             headers: {
@@ -70,4 +70,4 @@ export const getBooks = async function(search: string): Promise<BookDto[]> {
     } catch {
         return [];
     }
-} satisfies Endpoint;
+}
