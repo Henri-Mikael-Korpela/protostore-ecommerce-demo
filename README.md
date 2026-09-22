@@ -80,3 +80,4 @@ Topics to learn more about later:
 
 ## Day 5: Book Search Integration
 
+Implemented books search in UI.
