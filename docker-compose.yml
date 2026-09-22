@@ -42,6 +42,8 @@ services:
     volumes:
       - ./frontend:/app
       - frontend-node-modules:/app/node_modules
+      # Java DTOs are read by the java-dto Vite plugin (frontend/plugin/java-dto.ts)
+      - ./backend/src/main/java:/backend/src/main/java:ro
     depends_on:
       - backend
 

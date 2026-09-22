@@ -1,12 +1,13 @@
 import {useEffect, useState, type InputEvent } from 'react';
 import './App.css'
 import * as api from "./api.ts";
+import type { EndpointResponseAwaited } from "./api.ts";
 
 function SearchResultEntry({ title }: { title: string; }) {
   return <p>{title}</p>;
 }
 
-type Book = Awaited<ReturnType<typeof api.getBooks>>[number];
+type Book = EndpointResponseAwaited<'getBooks'>[number];
 
 function App() {
   const [books, setBooks] = useState<Book[]>([]);

@@ -81,3 +81,11 @@ Topics to learn more about later:
 ## Day 5: Book Search Integration
 
 Implemented books search in UI.
+
+Used Claude Code to build a custom Vite plugin that can parse DTO files from Java code. This way there is no need for handwritten corresponding types in TypeScript. Added custom path @protostore so that it is possible to import DTOs like this:
+
+```typescript
+import { type BookDto } from "@protostore/dto/BookDto.java";
+```
+
+Improved frontend API typing so that endpoint response types are automatically inferred, with little duplication required.

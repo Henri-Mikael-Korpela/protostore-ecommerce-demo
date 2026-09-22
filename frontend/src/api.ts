@@ -1,3 +1,7 @@
+import { type BookDto } from "@protostore/dto/BookDto.java";
+// Type-only self-import, used to derive endpoint names from this module's exports
+import type * as api from "./api.ts";
+
 type RequestOptions = {
     path: string;
     queryParams?: Record<string, string>;
@@ -30,7 +34,7 @@ function buildApiRequest<ResponseSuccess, HeaderT extends Record<string, string>
 }
 
 function buildApiRequestURI(request: RequestOptions): string {
-    let result = `${BASE_URL}${request.path}`;
+    let result = BASE_URL + request.path;
     if (Object.keys(request.queryParams).length > 0) {
         const queryParamEntries: string[] = [];
         for (const [key, value] of Object.entries(request.queryParams)) {
@@ -41,19 +45,29 @@ function buildApiRequestURI(request: RequestOptions): string {
     return result;
 }
 
-type GetBooksResponseDtoElement = {
-    isbn: string;
-    title: string;
-}
+type Endpoint = (...args: any[]) => Promise<any>;
 
-export function getBooks(search: string): Promise<GetBooksResponseDtoElement[]> {
-    return buildApiRequest<GetBooksResponseDtoElement[]>({
-        headers: {
-            "Content-Type": "application/json"
-        },
-        path: "/api/books",
-        queryParams: { search }
-    })
-        .then(result => result)
-        .catch(() => []);
-}
+/**
+ * Names of the exported values of this module that are endpoints.
+ */
+export type EndpointName = {
+    [K in keyof typeof api]: typeof api[K] extends Endpoint ? K : never;
+}[keyof typeof api];
+
+export type EndpointResponseAwaited<N extends EndpointName> = Awaited<ReturnType<typeof api[N]>>;
+
+/// Project specific API endpoints
+
+export const getBooks = async function(search: string): Promise<BookDto[]> {
+    try {
+        return await buildApiRequest({
+            headers: {
+                "Content-Type": "application/json"
+            },
+            path: "/api/books",
+            queryParams: {search}
+        });
+    } catch {
+        return [];
+    }
+} satisfies Endpoint;
