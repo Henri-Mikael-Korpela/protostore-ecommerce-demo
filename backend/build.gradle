@@ -52,6 +52,11 @@ def configureDatasourceFromEnvFile = { task ->
 
 tasks.named('bootRun') {
 	configureDatasourceFromEnvFile(it)
+
+	// Seed the dev database with the same basic fixture the integration tests
+	// use, so there's always something to see when running the app locally.
+	environment 'SPRING_SQL_INIT_MODE', 'always'
+	environment 'SPRING_SQL_INIT_DATA_LOCATIONS', 'file:src/test/resources/testdata/books-basic.sql'
 }
 
 // BooksControllerIntegrationTest needs a real Postgres to run Flyway migrations

@@ -1,6 +1,28 @@
+import {useEffect, useState, type InputEvent } from 'react';
 import './App.css'
+import * as api from "./api.ts";
+
+function SearchResultEntry({ title }: { title: string; }) {
+  return <p>{title}</p>;
+}
+
+type Book = Awaited<ReturnType<typeof api.getBooks>>[number];
 
 function App() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (searchQuery.length <= 1) {
+      setBooks([]);
+      return;
+    }
+
+    api.getBooks(searchQuery).then(books => {
+      setBooks(books);
+    });
+  }, [searchQuery]);
+
   return (
     <div className="page">
       <header className="site-header">
@@ -8,14 +30,27 @@ function App() {
       </header>
 
       <form className="search-bar">
-        <input
-          type="search"
-          className="search-input"
-          placeholder="Search for books, authors, or genres..."
-        />
-        <button type="submit" className="search-button">
-          Search
-        </button>
+        <div>
+          <input
+              type="search"
+              className="search-input"
+              onInput={(e: InputEvent<HTMLInputElement>) => {
+                return setSearchQuery(e.currentTarget.value);
+              }}
+              placeholder="Search for books, authors, or genres..."
+              value={searchQuery}
+          />
+          <button type="submit" className="search-button">
+            Search
+          </button>
+        </div>
+        {books.length > 0 &&
+          <div className="search-results-container">
+            {books.map(book =>
+                <SearchResultEntry key={book.isbn} title={book.title}/>
+            )}
+          </div>
+        }
       </form>
 
       <section className="banner">

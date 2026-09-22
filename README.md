@@ -54,7 +54,7 @@ Topics to learn more about later:
 - PostgreSQL: Operator `~` with regex string
 - Java: Constructor method reference
 
-### Day 3: Adding unit tests
+## Day 3: Adding unit tests
 
 Added one unit test to test the GET /api/books endpoint.
 
@@ -77,3 +77,6 @@ Using Claude Code, implemented a basis for full-text search for books.
 Topics to learn more about later:
 
 - Information retrieval (IR), specifically a hybrid lexical + semantic search
+
+## Day 5: Book Search Integration
+

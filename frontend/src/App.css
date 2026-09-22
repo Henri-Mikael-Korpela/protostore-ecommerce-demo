@@ -25,9 +25,15 @@
   color: var(--text-h);
 }
 
-.search-bar {
+.search-bar > div {
   display: flex;
   gap: 10px;
+}
+
+.search-results-container {
+  background: white;
+  position: absolute;
+  width: 80%;
 }
 
 .search-input {

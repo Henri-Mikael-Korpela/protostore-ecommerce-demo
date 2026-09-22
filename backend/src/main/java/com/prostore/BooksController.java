@@ -4,7 +4,7 @@ import com.prostore.repository.BookRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.prostore.dto.Book;
+import com.prostore.dto.BookDto;
 
 @RestController
 public class BooksController {
@@ -16,7 +16,7 @@ public class BooksController {
 	}
 
 	@GetMapping("/api/books")
-	public Book[] getBooks(
+	public BookDto[] getBooks(
 		@RequestParam(required = false) String search
    	) {
 		var books = (search != null)
@@ -24,8 +24,8 @@ public class BooksController {
 			: bookRepository.findAll();
 
 		return books.stream()
-				.map(book -> new Book(book.getIsbn(), book.getTitle()))
-				.toArray(Book[]::new);
+				.map(book -> new BookDto(book.getIsbn(), book.getTitle()))
+				.toArray(BookDto[]::new);
 	}
 
 }
