@@ -14,13 +14,86 @@ requirement. For running or debugging the backend outside of Docker (like
 - JDK 17 (the backend's Docker image also uses `eclipse-temurin:17-jdk`).
 - Gradle 8.14.3, which is not installed separately. The repo ships the Gradle wrapper (`./gradlew`).
 
-Before the first `docker compose up`, create a local `.env` file (gitignored,
-one per machine) so containers write files as your own user instead of root:
+## Setup
+
+Every machine needs a local `.env` file in the repository root (gitignored).
+It holds the database password, which is required, and the user and group ids
+the containers run as. The steps differ per host OS.
+
+### Linux host
+
+The source code is bind-mounted into the containers, so files the containers
+create (like `build/` and `.generated/`) get the container user's ids on the
+host. Set the ids to your own user so those files aren't owned by root or some
+other user:
 
 ```shell
 echo "UID=$(id -u)" > .env
 echo "GID=$(id -g)" >> .env
+echo "DB_PASSWORD=change-me" >> .env
 ```
+
+Then start everything:
+
+```shell
+docker compose up -d
+```
+
+### Windows host
+
+Requires Docker Desktop with the WSL 2 backend.
+
+Docker Desktop does not map container users to Windows users on bind mounts.
+Files the containers write to a Windows path (like `D:\...`) are owned by your
+Windows user whatever UID the container runs as. So the ids only need to exist
+in the images, and the defaults work. Create `.env` in PowerShell:
+
+```powershell
+@"
+UID=1000
+GID=1000
+DB_PASSWORD=change-me
+"@ | Set-Content -Encoding ascii .env
+```
+
+Use `Set-Content -Encoding ascii` rather than `>`. Windows PowerShell 5.1's
+`>` writes UTF-16, which Docker Compose can't read.
+
+Scripts that run inside the Linux containers (`gradlew`, `*.sh`) must keep LF
+line endings. `.gitattributes` enforces this even with `core.autocrlf=true`.
+A clone made before `.gitattributes` existed may still have a CRLF `gradlew`,
+which makes the backend fail with errors like `/bin/sh^M: bad interpreter`.
+Check the file out again to fix it:
+
+```powershell
+Remove-Item backend/gradlew
+git checkout -- backend/gradlew
+```
+
+Then start everything:
+
+```powershell
+docker compose up -d
+```
+
+Automatic reloading (the backend restarting via `entr` and Vite hot reload)
+relies on file change notifications, which are less reliable for files on a
+Windows drive. If changes aren't picked up, restart the service
+(`docker compose restart backend`) or clone the repository inside a WSL 2
+distribution instead (like `\\wsl$\Ubuntu\home\<you>\...`). Then run
+`docker compose` from a WSL shell and follow the Linux host instructions. This
+also makes file I/O much faster.
+
+### Services
+
+Once the containers are up:
+
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8080 (like http://localhost:8080/api/books)
+- PostgreSQL: `localhost:5433` (`DB_PORT_TO_HOST` in `.env` changes the port)
+
+Follow the logs with `docker compose logs -f` and stop everything with
+`docker compose down`.
 
 ## Development Process
 
@@ -89,3 +162,7 @@ import { type BookDto } from "@protostore/dto/BookDto.java";
 ```
 
 Improved frontend API typing so that endpoint response types are automatically inferred, with little duplication required.
+
+## Day 6: Docker and Windows
+
+I had to switch to Windows as my main operating system. Then I realized Docker didn't just work out of the box. I had to 
