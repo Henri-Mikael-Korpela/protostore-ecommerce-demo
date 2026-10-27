@@ -42,7 +42,9 @@ export function javaDto(options: JavaDtoPluginOptions): Plugin {
         } catch (error) {
             throw new Error(`Failed to parse ${javaFile}: ${(error as Error).message}`);
         }
-        fs.mkdirSync(path.dirname(target), { recursive: true });
+        fs.mkdirSync(path.dirname(target), {
+            recursive: true,
+        });
         // Avoid touching unchanged files so tsc/editors don't needlessly re-check
         if (!fs.existsSync(target) || fs.readFileSync(target, "utf8") !== declaration) {
             fs.writeFileSync(target, declaration);
@@ -51,11 +53,16 @@ export function javaDto(options: JavaDtoPluginOptions): Plugin {
 
     function remove(javaFile: string): void {
         const relative = path.relative(javaRoot, javaFile);
-        fs.rmSync(path.join(outDir, relative.replace(/\.java$/, ".d.java.ts")), { force: true });
+        fs.rmSync(path.join(outDir, relative.replace(/\.java$/, ".d.java.ts")), {
+            force: true,
+        });
     }
 
     function generateAll(): void {
-        fs.rmSync(outDir, { recursive: true, force: true });
+        fs.rmSync(outDir, {
+            recursive: true,
+            force: true,
+        });
         for (const file of walk(javaRoot)) {
             if (isJavaSource(file)) {
                 generate(file);
@@ -141,6 +148,7 @@ type Token = { kind: "ident" | "symbol" | "literal"; value: string };
 
 function tokenize(source: string): Token[] {
     const tokens: Token[] = [];
+
     let i = 0;
     while (i < source.length) {
         const char = source[i];
@@ -155,30 +163,49 @@ function tokenize(source: string): Token[] {
         } else if (source.startsWith('"""', i)) {
             const end = source.indexOf('"""', i + 3);
             i = end === -1 ? source.length : end + 3;
-            tokens.push({ kind: "literal", value: "" });
+            tokens.push({
+                kind: "literal",
+                value: "",
+            });
         } else if (char === '"' || char === "'") {
             let j = i + 1;
             while (j < source.length && source[j] !== char) {
                 j += source[j] === "\\" ? 2 : 1;
             }
             i = j + 1;
-            tokens.push({ kind: "literal", value: "" });
+            tokens.push({
+                kind: "literal",
+                value: "",
+            });
         } else if (/[A-Za-z_$]/.test(char)) {
             const match = /^[A-Za-z0-9_$]+/.exec(source.slice(i))!;
-            tokens.push({ kind: "ident", value: match[0] });
+            tokens.push({
+                kind: "ident",
+                value: match[0],
+            });
             i += match[0].length;
         } else if (/[0-9]/.test(char)) {
             const match = /^[0-9A-Za-z_.]+/.exec(source.slice(i))!;
-            tokens.push({ kind: "literal", value: match[0] });
+            tokens.push({
+                kind: "literal",
+                value: match[0],
+            });
             i += match[0].length;
         } else if (source.startsWith("...", i)) {
-            tokens.push({ kind: "symbol", value: "..." });
+            tokens.push({
+                kind: "symbol",
+                value: "...",
+            });
             i += 3;
         } else {
-            tokens.push({ kind: "symbol", value: char });
+            tokens.push({
+                kind: "symbol",
+                value: char,
+            });
             i++;
         }
     }
+
     return tokens;
 }
 
@@ -237,7 +264,12 @@ class Parser {
                 }
             }
         }
-        return { packageName, imports, declarations };
+
+        return {
+            packageName,
+            imports,
+            declarations,
+        };
     }
 
     /** Parses a top-level type declaration. Interfaces and annotations are skipped. */
@@ -259,31 +291,52 @@ class Parser {
             const fields = this.recordComponents();
             this.skipUntilBlock();
             this.skipBalanced("{", "}");
-            return { kind: "record", name, typeParams, fields };
+            return {
+                kind: "record",
+                name,
+                typeParams,
+                fields,
+            };
         }
         this.skipUntilBlock();
         if (keyword === "enum") {
-            return { kind: "enum", name, constants: this.enumBody() };
+            return {
+                kind: "enum",
+                name,
+                constants: this.enumBody(),
+            };
         }
-        return { kind: "class", name, typeParams, fields: this.classBody() };
+        return {
+            kind: "class",
+            name,
+            typeParams,
+            fields: this.classBody(),
+        };
     }
 
     private recordComponents(): Field[] {
         const fields: Field[] = [];
+
         this.expect("(");
         while (!this.accept(")")) {
             const { nullable } = this.modifiersAndAnnotations();
             const type = this.type();
             this.accept("...");
             const name = this.ident();
-            fields.push({ name, type: this.arraySuffix(type), nullable });
+            fields.push({
+                name,
+                type: this.arraySuffix(type),
+                nullable,
+            });
             this.accept(",");
         }
+
         return fields;
     }
 
     private enumBody(): string[] {
         const constants: string[] = [];
+
         this.expect("{");
         while (!this.peek(";") && !this.peek("}")) {
             this.modifiersAndAnnotations();
@@ -299,12 +352,14 @@ class Parser {
         // Skip the rest of the body (fields, constructors, methods)
         this.accept(";");
         this.skipRestOfBlock();
+
         return constants;
     }
 
     /** Collects non-static fields of a class body, skipping methods and nested types. */
     private classBody(): Field[] {
         const fields: Field[] = [];
+
         this.expect("{");
         while (!this.accept("}")) {
             if (this.accept(";")) {
@@ -344,10 +399,16 @@ class Parser {
                 continue;
             }
             // Field declaration, possibly with multiple declarators: `int a, b = 1;`
-            let current = { name, type: this.arraySuffix(type) };
+            let current = {
+                name,
+                type: this.arraySuffix(type),
+            };
             for (;;) {
                 if (!isStatic) {
-                    fields.push({ ...current, nullable });
+                    fields.push({
+                        ...current,
+                        nullable,
+                    });
                 }
                 if (this.accept("=")) {
                     this.skipInitializer();
@@ -357,15 +418,20 @@ class Parser {
                 }
                 this.expect(",");
                 const nextName = this.ident();
-                current = { name: nextName, type: this.arraySuffix(type) };
+                current = {
+                    name: nextName,
+                    type: this.arraySuffix(type),
+                };
             }
         }
+
         return fields;
     }
 
     private modifiersAndAnnotations(): { nullable: boolean; isStatic: boolean } {
         let nullable = false;
         let isStatic = false;
+
         for (;;) {
             if (this.peek("@") && !this.peekIdent("interface", 1)) {
                 this.position++;
@@ -382,13 +448,17 @@ class Parser {
             } else if (this.peekIdent("non") && this.peek("-", 1)) {
                 this.position += 3;
             } else {
-                return { nullable, isStatic };
+                return {
+                    nullable,
+                    isStatic,
+                };
             }
         }
     }
 
     private typeParameters(): string[] {
         const params: string[] = [];
+
         this.expect("<");
         let depth = 1;
         let expectName = true;
@@ -405,6 +475,7 @@ class Parser {
                 expectName = false;
             }
         }
+
         return params;
     }
 
@@ -424,7 +495,9 @@ class Parser {
             if (this.acceptIdent("super")) {
                 this.type();
             }
-            return { kind: "wildcard" };
+            return {
+                kind: "wildcard",
+            };
         }
         const name = this.qualifiedName();
         const args: JavaType[] = [];
@@ -434,23 +507,33 @@ class Parser {
                 this.accept(",");
             }
         }
-        return this.arraySuffix({ kind: "named", name, args });
+        return this.arraySuffix({
+            kind: "named",
+            name,
+            args,
+        });
     }
 
     private arraySuffix(type: JavaType): JavaType {
         while (this.peek("[") && this.peek("]", 1)) {
             this.position += 2;
-            type = { kind: "array", element: type };
+            type = {
+                kind: "array",
+                element: type,
+            };
         }
+
         return type;
     }
 
     private qualifiedName(allowWildcard = false): string {
         let name = this.ident();
+
         while (this.peek(".") && (this.current(1)?.kind === "ident" || (allowWildcard && this.peek("*", 1)))) {
             this.position++;
             name += "." + this.next().value;
         }
+
         return name;
     }
 
@@ -673,7 +756,12 @@ function toTypeScript(type: JavaType, scope: TypeScope): string {
         return "unknown";
     }
     if (ARRAY_TYPES.has(simpleName)) {
-        return toTypeScript({ kind: "array", element: type.args[0] ?? { kind: "wildcard" } }, scope);
+        return toTypeScript({
+            kind: "array",
+            element: type.args[0] ?? {
+                kind: "wildcard",
+            },
+        }, scope);
     }
     if (MAP_TYPES.has(simpleName)) {
         const key = args[0] === "number" ? "number" : "string";
@@ -731,6 +819,7 @@ function resolveReference(name: string, scope: TypeScope): string | null {
             return simpleName;
         }
     }
+
     return null;
 }
 

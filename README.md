@@ -95,6 +95,10 @@ Once the containers are up:
 Follow the logs with `docker compose logs -f` and stop everything with
 `docker compose down`.
 
+## Coding Style
+
+- [TypeScript Programming Style Guide](./docs/typescript-programming-style-guide.md)
+
 ## Development Process
 
 ### Day 1: Basics
@@ -166,3 +170,9 @@ Improved frontend API typing so that endpoint response types are automatically i
 ## Day 6: Docker and Windows
 
 I had to switch to Windows as my main operating system. Then I realized Docker didn't just work out of the box. I had to change some Docker settings and file structures to get things going. Thanks to Claude it was much faster but due to many complications on my own Windows operating system (like running out of disc space all of a sudden), I sank many into it.
+
+## Day 7: Shopping Cart Functionality
+
+Implemented shopping cart functionality. There's no login yet, only guest users.
+
+A guest user is now able to add books to their shopping cart.

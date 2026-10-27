@@ -21,7 +21,7 @@ function buildApiRequest<ResponseSuccess, HeaderT extends Record<string, string>
         queryParams: request.queryParams,
     });
     return fetch(uri, {
-        headers: request.headers
+        headers: request.headers,
     })
         .then(async (value: Response) => {
             if (request.headers?.["Content-Type"] === "application/json") {
@@ -35,6 +35,7 @@ function buildApiRequest<ResponseSuccess, HeaderT extends Record<string, string>
 
 function buildApiRequestURI(request: RequestOptions): string {
     let result = BASE_URL + request.path;
+
     if (Object.keys(request.queryParams).length > 0) {
         const queryParamEntries: string[] = [];
         for (const [key, value] of Object.entries(request.queryParams)) {
@@ -42,6 +43,7 @@ function buildApiRequestURI(request: RequestOptions): string {
         }
         result += "?" + queryParamEntries.join("&");
     }
+
     return result;
 }
 
@@ -62,10 +64,12 @@ export async function getBooks(search: string): Promise<BookDto[]> {
     try {
         return await buildApiRequest({
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             path: "/api/books",
-            queryParams: {search}
+            queryParams: {
+                search,
+            },
         });
     } catch {
         return [];
