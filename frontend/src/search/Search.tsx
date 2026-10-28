@@ -18,12 +18,12 @@ function SearchResultEntry({ book, active, onOpen, onActivate, onAddToCart }: {
     active: boolean;
     onOpen: (book: Book) => void;
     onActivate: () => void;
-    onAddToCart: (book: Book) => void;
+    onAddToCart: (book: Book, source: HTMLElement) => void;
 }) {
     function onAddToCartClick(e: MouseEvent<HTMLButtonElement>) {
         // Adding to cart shouldn't also open the book
         e.stopPropagation();
-        onAddToCart(book);
+        onAddToCart(book, e.currentTarget);
     }
 
     return (
@@ -44,7 +44,7 @@ function SearchResultEntry({ book, active, onOpen, onActivate, onAddToCart }: {
     );
 }
 
-export function Search({ onAddToCart }: { onAddToCart: (book: Book) => void; }) {
+export function Search({ onAddToCart }: { onAddToCart: (book: Book, source: HTMLElement) => void; }) {
     const [books, setBooks] = useState<Book[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     // Index of the result highlighted with the arrow keys or mouse, -1 when none is

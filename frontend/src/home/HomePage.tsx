@@ -12,21 +12,21 @@ type FeaturedBooksState =
     | { kind: "loaded"; books: Book[] }
     | { kind: "failed"; error: ApiError };
 
-function FeaturedBook({ book, onAddToCart }: { book: Book; onAddToCart: (book: Book) => void; }) {
+function FeaturedBook({ book, onAddToCart }: { book: Book; onAddToCart: (book: Book, source: HTMLElement) => void; }) {
     return (
         <article className="featured-book">
             <Link to={bookPath(book.id)} className="featured-book-link">
                 <BookCover key={book.isbn} isbn={book.isbn} title={book.title} size="large" />
                 <h3 className="featured-book-title">{book.title}</h3>
             </Link>
-            <button type="button" className="primary-button" onClick={() => onAddToCart(book)}>
+            <button type="button" className="primary-button" onClick={e => onAddToCart(book, e.currentTarget)}>
                 Add to cart
             </button>
         </article>
     );
 }
 
-export function HomePage({ onAddToCart }: { onAddToCart: (book: Book) => void; }) {
+export function HomePage({ onAddToCart }: { onAddToCart: (book: Book, source: HTMLElement) => void; }) {
     const [state, setState] = useState<FeaturedBooksState>({
         kind: "loading",
     });

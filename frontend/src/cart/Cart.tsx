@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { CART_BUTTON_ID } from "./fly-to-cart.ts";
 import type { CartItem } from "./useCart.ts";
 
 export function Cart({ items, itemCount, onRemove }: {
@@ -12,6 +13,7 @@ export function Cart({ items, itemCount, onRemove }: {
     return (
         <div className="cart">
             <button
+                id={CART_BUTTON_ID}
                 type="button"
                 className="cart-button"
                 aria-label={`Shopping cart, ${itemCount} items`}

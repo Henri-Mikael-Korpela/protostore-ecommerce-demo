@@ -42,7 +42,7 @@ function BookLoadError({ error, onRetry }: { error: ApiError; onRetry: () => voi
     );
 }
 
-function BookDetails({ book, onAddToCart }: { book: Book; onAddToCart: (book: Book) => void; }) {
+function BookDetails({ book, onAddToCart }: { book: Book; onAddToCart: (book: Book, source: HTMLElement) => void; }) {
     return (
         <article className="book-page">
             <BookCover key={book.isbn} isbn={book.isbn} title={book.title} size="large" />
@@ -55,7 +55,7 @@ function BookDetails({ book, onAddToCart }: { book: Book; onAddToCart: (book: Bo
                     <dd>{book.isbn ?? "Not available"}</dd>
                 </dl>
                 <div className="book-page-actions">
-                    <button type="button" className="primary-button" onClick={() => onAddToCart(book)}>
+                    <button type="button" className="primary-button" onClick={e => onAddToCart(book, e.currentTarget)}>
                         Add to cart
                     </button>
                 </div>
@@ -64,7 +64,10 @@ function BookDetails({ book, onAddToCart }: { book: Book; onAddToCart: (book: Bo
     );
 }
 
-export function BookPage({ bookId, onAddToCart }: { bookId: string; onAddToCart: (book: Book) => void; }) {
+export function BookPage({ bookId, onAddToCart }: {
+    bookId: string;
+    onAddToCart: (book: Book, source: HTMLElement) => void;
+}) {
     const [state, setState] = useState<BookState>({
         kind: "loading",
     });

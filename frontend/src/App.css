@@ -38,6 +38,15 @@
   }
 }
 
+/* Copy of a book cover flying to the cart, see cart/fly-to-cart.ts. Its position and size are set when it is created */
+.flying-cover {
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  pointer-events: none;
+  transform-origin: center;
+}
+
 /* The SVG is used as a mask so the icon follows the text color in light and dark mode */
 .cart-icon {
   width: 24px;
