@@ -5,6 +5,8 @@ import type { ApiError, EndpointValue } from "../api.ts";
 import { Link } from "../router.tsx";
 import { BookCover } from "./BookCover.tsx";
 
+import styles from "./BookPage.module.css";
+
 type Book = EndpointValue<'getBook'>;
 
 type BookState =
@@ -20,23 +22,23 @@ function isBookMissing(error: ApiError): boolean {
 function BookLoadError({ error, onRetry }: { error: ApiError; onRetry: () => void; }) {
     if (isBookMissing(error)) {
         return (
-            <section className="book-page-status">
+            <section className={styles.status}>
                 <h1>Book not found</h1>
                 <p>The book you are looking for does not exist.</p>
-                <Link to="/" className="book-page-back">Back to the store</Link>
+                <Link to="/" className={styles.back}>Back to the store</Link>
             </section>
         );
     }
 
     return (
-        <section className="book-page-status" role="alert">
+        <section className={styles.status} role="alert">
             <h1>Could not load the book</h1>
             <p>{api.apiErrorMessage(error)}</p>
-            <div className="book-page-status-actions">
+            <div className={styles.statusActions}>
                 <button type="button" className="primary-button" onClick={onRetry}>
                     Try again
                 </button>
-                <Link to="/" className="book-page-back">Back to the store</Link>
+                <Link to="/" className={styles.back}>Back to the store</Link>
             </div>
         </section>
     );
@@ -44,17 +46,17 @@ function BookLoadError({ error, onRetry }: { error: ApiError; onRetry: () => voi
 
 function BookDetails({ book, onAddToCart }: { book: Book; onAddToCart: (book: Book, source: HTMLElement) => void; }) {
     return (
-        <article className="book-page">
+        <article className={styles.page}>
             <BookCover key={book.isbn} isbn={book.isbn} title={book.title} size="large" />
 
-            <div className="book-page-details">
-                <Link to="/" className="book-page-back">← Back to the store</Link>
-                <h1 className="book-page-title">{book.title}</h1>
-                <dl className="book-page-info">
+            <div className={styles.details}>
+                <Link to="/" className={styles.back}>← Back to the store</Link>
+                <h1 className={styles.title}>{book.title}</h1>
+                <dl className={styles.info}>
                     <dt>ISBN</dt>
                     <dd>{book.isbn ?? "Not available"}</dd>
                 </dl>
-                <div className="book-page-actions">
+                <div className={styles.actions}>
                     <button type="button" className="primary-button" onClick={e => onAddToCart(book, e.currentTarget)}>
                         Add to cart
                     </button>
@@ -107,7 +109,7 @@ export function BookPage({ bookId, onAddToCart }: {
 
     switch (state.kind) {
         case "loading":
-            return <p className="book-page-status">Loading book...</p>;
+            return <p className={styles.status}>Loading book...</p>;
         case "failed":
             return <BookLoadError error={state.error} onRetry={() => setAttempt(attempt + 1)} />;
         case "loaded":

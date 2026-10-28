@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { CART_BUTTON_ID } from "./fly-to-cart.ts";
 import type { CartItem } from "./useCart.ts";
 
+import styles from "./Cart.module.css";
+
 export function Cart({ items, itemCount, onRemove }: {
     items: CartItem[];
     itemCount: number;
@@ -11,29 +13,29 @@ export function Cart({ items, itemCount, onRemove }: {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="cart">
+        <div className={styles.cart}>
             <button
                 id={CART_BUTTON_ID}
                 type="button"
-                className="cart-button"
+                className={styles.button}
                 aria-label={`Shopping cart, ${itemCount} items`}
                 aria-expanded={open}
                 onClick={() => setOpen(!open)}
             >
-                <span className="cart-icon" aria-hidden="true" />
-                {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
+                <span className={styles.icon} aria-hidden="true" />
+                {itemCount > 0 && <span className={styles.badge}>{itemCount}</span>}
             </button>
             {open &&
-                <div className="cart-panel">
+                <div className={styles.panel}>
                     {items.length === 0
-                        ? <p className="cart-empty">Your cart is empty.</p>
+                        ? <p className={styles.empty}>Your cart is empty.</p>
                         : items.map(item =>
-                            <div key={item.id} className="cart-item">
-                                <span className="cart-item-title">{item.title}</span>
-                                <span className="cart-item-quantity">×{item.quantity}</span>
+                            <div key={item.id} className={styles.item}>
+                                <span className={styles.itemTitle}>{item.title}</span>
+                                <span>×{item.quantity}</span>
                                 <button
                                     type="button"
-                                    className="cart-item-remove"
+                                    className={styles.itemRemove}
                                     aria-label={`Remove ${item.title} from cart`}
                                     onClick={() => onRemove(item.id)}
                                 >

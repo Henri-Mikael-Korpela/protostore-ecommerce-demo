@@ -2,11 +2,16 @@
 // icon, which then briefly grows and changes color. The copy lives outside of React, in the document
 // body, because it only exists for a moment and no component needs to know about it.
 
+import styles from "./fly-to-cart.module.css";
+
 /** ID of the element the cover flies to. Set by the Cart component. */
 export const CART_BUTTON_ID = "cart-button";
 
-/** Class of the cover images, set by the BookCover component. */
-const COVER_SELECTOR = ".book-cover";
+// Not a class, because class names in CSS modules are renamed and are not known outside of the module
+/** Attribute of the cover images, set by the BookCover component. */
+const COVER_ATTRIBUTE = "data-book-cover";
+
+const COVER_SELECTOR = `[${COVER_ATTRIBUTE}]`;
 
 const FLY_DURATION_MS = 700;
 
@@ -91,8 +96,10 @@ export function flyToCart(source: Element): void {
 
     // The original has already been loaded, so the copy doesn't need to be loaded lazily
     clone.removeAttribute("loading");
+    // So that the copy isn't found as a cover when the next book is added
+    clone.removeAttribute(COVER_ATTRIBUTE);
     clone.setAttribute("aria-hidden", "true");
-    clone.classList.add("flying-cover");
+    clone.classList.add(styles.flyingCover);
     Object.assign(clone.style, {
         top: `${from.top}px`,
         left: `${from.left}px`,

@@ -1,0 +1,28 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 24px 32px 64px;
+  text-align: left;
+  flex-grow: 1;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    padding: 20px 20px 40px;
+  }
+}
+
+.siteHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-family: var(--heading);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+  color: var(--text-h);
+  text-decoration: none;
+}

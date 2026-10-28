@@ -1,0 +1,8 @@
+/* Copy of a book cover flying to the cart. Its position and size are set when it is created */
+.flyingCover {
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  pointer-events: none;
+  transform-origin: center;
+}

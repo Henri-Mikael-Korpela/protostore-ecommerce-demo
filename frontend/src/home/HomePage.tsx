@@ -5,6 +5,8 @@ import type { ApiError, EndpointValue } from "../api.ts";
 import { BookCover } from "../book/BookCover.tsx";
 import { bookPath, Link } from "../router.tsx";
 
+import styles from "./HomePage.module.css";
+
 type Book = EndpointValue<'getFeaturedBooks'>[number];
 
 type FeaturedBooksState =
@@ -14,10 +16,10 @@ type FeaturedBooksState =
 
 function FeaturedBook({ book, onAddToCart }: { book: Book; onAddToCart: (book: Book, source: HTMLElement) => void; }) {
     return (
-        <article className="featured-book">
-            <Link to={bookPath(book.id)} className="featured-book-link">
+        <article className={styles.book}>
+            <Link to={bookPath(book.id)} className={styles.bookLink}>
                 <BookCover key={book.isbn} isbn={book.isbn} title={book.title} size="large" />
-                <h3 className="featured-book-title">{book.title}</h3>
+                <h3 className={styles.bookTitle}>{book.title}</h3>
             </Link>
             <button type="button" className="primary-button" onClick={e => onAddToCart(book, e.currentTarget)}>
                 Add to cart
@@ -66,10 +68,10 @@ export function HomePage({ onAddToCart }: { onAddToCart: (book: Book, source: HT
 
     switch (state.kind) {
         case "loading":
-            return <p className="home-status">Loading featured books...</p>;
+            return <p className={styles.status}>Loading featured books...</p>;
         case "failed":
             return (
-                <section className="home-status" role="alert">
+                <section className={styles.status} role="alert">
                     <p>{api.apiErrorMessage(state.error)}</p>
                     <button type="button" className="primary-button" onClick={() => setAttempt(attempt + 1)}>
                         Try again
@@ -78,12 +80,12 @@ export function HomePage({ onAddToCart }: { onAddToCart: (book: Book, source: HT
             );
         case "loaded":
             if (state.books.length === 0) {
-                return <p className="home-status">There are no featured books at the moment.</p>;
+                return <p className={styles.status}>There are no featured books at the moment.</p>;
             }
             return (
-                <section className="featured-books">
-                    <h2 className="featured-books-heading">Featured books</h2>
-                    <div className="featured-books-list">
+                <section className={styles.featuredBooks}>
+                    <h2 className={styles.heading}>Featured books</h2>
+                    <div className={styles.list}>
                         {state.books.map(book =>
                             <FeaturedBook key={book.id} book={book} onAddToCart={onAddToCart} />
                         )}

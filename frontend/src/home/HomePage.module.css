@@ -1,0 +1,66 @@
+.featuredBooks {
+  padding: 40px 48px 48px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+}
+
+.heading {
+  margin: 0 0 24px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 220px);
+  justify-content: space-between;
+  gap: 32px 24px;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+}
+
+.book {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 220px;
+}
+
+.bookLink {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover .bookTitle {
+    text-decoration: underline;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+}
+
+.bookTitle {
+  margin: 0;
+  font-size: 18px;
+  line-height: 125%;
+  color: var(--text-h);
+}
+
+.status {
+  padding: 48px 0;
+  text-align: center;
+}

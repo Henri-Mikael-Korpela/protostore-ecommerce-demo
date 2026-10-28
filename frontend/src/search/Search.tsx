@@ -5,6 +5,8 @@ import type { ApiError, EndpointValue } from "../api.ts";
 import { BookCover } from "../book/BookCover.tsx";
 import { bookPath, navigate } from "../router.tsx";
 
+import styles from "./Search.module.css";
+
 type Book = EndpointValue<'getBooks'>[number];
 
 const RESULTS_ID = "search-results";
@@ -31,13 +33,13 @@ function SearchResultEntry({ book, active, onOpen, onActivate, onAddToCart }: {
             id={resultOptionId(book)}
             role="option"
             aria-selected={active}
-            className={active ? "search-result-entry active" : "search-result-entry"}
+            className={active ? `${styles.entry} ${styles.active}` : styles.entry}
             onClick={() => onOpen(book)}
             onMouseEnter={onActivate}
         >
             <BookCover key={book.isbn} isbn={book.isbn} title={book.title} size="small" />
-            <span className="search-result-title">{book.title}</span>
-            <button type="button" className="add-to-cart-button" onClick={onAddToCartClick}>
+            <span className={styles.entryTitle}>{book.title}</span>
+            <button type="button" className={styles.addToCartButton} onClick={onAddToCartClick}>
                 Add to cart
             </button>
         </div>
@@ -122,11 +124,11 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book, source: HTML
     const activeBook = activeIndex >= 0 && activeIndex < books.length ? books[activeIndex] : undefined;
 
     return (
-        <form className="search-bar" onSubmit={onSubmit}>
-            <div>
+        <form className={styles.form} onSubmit={onSubmit}>
+            <div className={styles.inputRow}>
                 <input
                     type="search"
-                    className="search-input"
+                    className={styles.input}
                     role="combobox"
                     aria-label="Search books"
                     aria-autocomplete="list"
@@ -140,12 +142,12 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book, source: HTML
                     placeholder="Search for books, authors, or genres..."
                     value={searchQuery}
                 />
-                <button type="submit" className="search-button">
+                <button type="submit" className={styles.button}>
                     Search
                 </button>
             </div>
             {showResults &&
-                <div id={RESULTS_ID} role="listbox" className="search-results-container">
+                <div id={RESULTS_ID} role="listbox" className={styles.results}>
                     {books.map((book, index) =>
                         <SearchResultEntry
                             key={book.id}
@@ -159,7 +161,7 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book, source: HTML
                 </div>
             }
             {searchError !== undefined &&
-                <div className="search-results-container search-error" role="alert">
+                <div className={`${styles.results} ${styles.error}`} role="alert">
                     {api.apiErrorMessage(searchError)}
                 </div>
             }

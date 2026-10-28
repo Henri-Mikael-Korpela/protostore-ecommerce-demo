@@ -1,4 +1,3 @@
-import './App.css'
 import { BookPage } from "./book/BookPage.tsx";
 import { Cart } from "./cart/Cart.tsx";
 import { flyToCart } from "./cart/fly-to-cart.ts";
@@ -6,6 +5,8 @@ import { useCart } from "./cart/useCart.ts";
 import { HomePage } from "./home/HomePage.tsx";
 import { Link, matchBookPath, usePath } from "./router.tsx";
 import { Search } from "./search/Search.tsx";
+
+import styles from "./App.module.css";
 
 function App() {
     const cart = useCart();
@@ -22,9 +23,9 @@ function App() {
     }
 
     return (
-        <div className="page">
-            <header className="site-header">
-                <Link to="/" className="logo">Prostore</Link>
+        <div className={styles.page}>
+            <header className={styles.siteHeader}>
+                <Link to="/" className={styles.logo}>Prostore</Link>
                 <Cart items={cart.items} itemCount={cart.itemCount} onRemove={cart.removeItem} />
             </header>
 

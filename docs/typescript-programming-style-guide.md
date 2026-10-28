@@ -10,6 +10,8 @@ Place the import statements in the following sections, in the following order:
   - Standard library imports
   - 3rd party or external imports
   - Project specific local imports
+    - TypeScript files
+    - CSS files
 
 Each of these sections should be separated by an empty line.
 
@@ -57,6 +59,13 @@ Each of these sections should be separated by an empty line.
 - Use `void` only for a promise of an async function that handles its own errors and never rejects. Document that it never rejects in the function's doc comment.
 - Inside a `try` block, use `return await` instead of `return` when returning a promise, so its rejection is caught by the `catch` block.
 - In effects, ignore results of asynchronous work that finishes after the effect is cleaned up, so outdated results don't overwrite newer ones.
+
+## CSS Styling
+
+- Put the styles of a component in a CSS module (`Component.module.css`) next to the component and import it as `styles`. Class names of a CSS module are local to it, so they can't affect other components.
+- Name the classes in camelCase (`styles.siteHeader`), and name them by their role in the component (`styles.title`), not by the component's name.
+- Put only styles that are common to the whole app in `frontend/src/index.css`: CSS variables, element resets and the classes shared by several components.
+- Don't find elements by their CSS module class names in code, the names are renamed on build. Use a `data-` attribute or an ID.
 
 ## React Components
 
