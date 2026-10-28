@@ -17,6 +17,10 @@ Each of these sections should be separated by an empty line.
 
 - Prefer imperative and procedural style over declarative and functional style. In embedded logic in JSX elements functional style is fine.
 
+## Control flow
+
+- Use exhaustive checks in `switch` statements. Do not provide a default case for this will be bypass the exhaustive check.
+
 ## Objects
 
 - Separate each property assigned in an object on its own line.
@@ -25,6 +29,7 @@ Each of these sections should be separated by an empty line.
 
 ## Functions
 
+- Return from a function without a result variable whenever you can.
 - For functions composing a value as a return value using conditions and loops, place the variable for the return value in the beginning of the function with an empty line after it. For the single return statement at the end, ensure there's an empty line above it.
 
 ## Null and undefined values
@@ -35,9 +40,13 @@ Each of these sections should be separated by an empty line.
 - Use `undefined` for logic that stays in the TypeScript code:
   - For optional parameters and properties.
 
-## Exception handling
+## Errors and exception handling
 
 - Avoid exception handling whenever possible. Prefer errors as values.
+- Return a `Result<T, E>` (see `frontend/src/result.ts`) from an operation that can fail.
+- Convert exceptions of APIs that throw, such as `fetch` and `JSON.parse`, to error values right where the API is called.
+- Model the kinds of errors as a discriminated union, e.g. `ApiError` in `frontend/src/api.ts`, and handle them with an exhaustive checks.
+- Validate untrusted data, such as API responses and local storage contents, at runtime with the validators in `frontend/src/validation.ts` instead of asserting its type with `as`.
 - Only throw and reject with `Error` objects, so that a stack trace is preserved. Pass the original error as `cause` when wrapping it: `new Error("message", { cause: error })`.
 - Treat caught errors as `unknown` and narrow their type before use.
 

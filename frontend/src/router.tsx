@@ -1,5 +1,7 @@
 import { useSyncExternalStore, type MouseEvent, type ReactNode } from "react";
 
+import { decodeUriComponent } from "./url.ts";
+
 // Minimal client-side router built on the History API. Vite's dev server falls back to
 // index.html for unknown paths, so deep links such as /books/<id> load the app directly.
 
@@ -51,11 +53,15 @@ export function bookPath(bookId: string): string {
  * Returns the book ID of a book page path, or undefined if the path is not a book page.
  */
 export function matchBookPath(path: string): string | undefined {
-    let result: string | undefined;
-
-    if (path.startsWith(BOOK_PATH_PREFIX) && path.length > BOOK_PATH_PREFIX.length) {
-        result = decodeURIComponent(path.slice(BOOK_PATH_PREFIX.length));
+    if (!path.startsWith(BOOK_PATH_PREFIX) || path.length === BOOK_PATH_PREFIX.length) {
+        return undefined;
     }
 
-    return result;
+    // A malformed percent-encoding can't be a book ID, so such a path is not a book page
+    const bookId = decodeUriComponent(path.slice(BOOK_PATH_PREFIX.length));
+    if (!bookId.ok) {
+        return undefined;
+    }
+
+    return bookId.value;
 }

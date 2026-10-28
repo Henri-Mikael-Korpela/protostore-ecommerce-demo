@@ -1,11 +1,11 @@
 import { useEffect, useState, type InputEvent, type KeyboardEvent, type MouseEvent, type SubmitEvent } from "react";
 
 import * as api from "../api.ts";
-import type { EndpointResponseAwaited } from "../api.ts";
+import type { ApiError, EndpointValue } from "../api.ts";
 import { BookCover } from "../book/BookCover.tsx";
 import { bookPath, navigate } from "../router.tsx";
 
-type Book = EndpointResponseAwaited<'getBooks'>[number];
+type Book = EndpointValue<'getBooks'>[number];
 
 const RESULTS_ID = "search-results";
 
@@ -49,6 +49,8 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book) => void; }) 
     const [searchQuery, setSearchQuery] = useState("");
     // Index of the result highlighted with the arrow keys or mouse, -1 when none is
     const [activeIndex, setActiveIndex] = useState(-1);
+    // Error of the latest search, undefined when it succeeded
+    const [searchError, setSearchError] = useState<ApiError | undefined>(undefined);
 
     useEffect(() => {
         // Ignore responses of outdated queries so results arriving out of order don't overwrite newer ones
@@ -57,14 +59,22 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book) => void; }) 
         if (searchQuery.length <= 1) {
             setBooks([]);
             setActiveIndex(-1);
+            setSearchError(undefined);
             return;
         }
 
         void (async () => {
             const result = await api.getBooks(searchQuery);
-            if (!ignore) {
-                setBooks(result);
-                setActiveIndex(-1);
+            if (ignore) {
+                return;
+            }
+            setActiveIndex(-1);
+            if (result.ok) {
+                setBooks(result.value);
+                setSearchError(undefined);
+            } else {
+                setBooks([]);
+                setSearchError(result.error);
             }
         })();
 
@@ -146,6 +156,11 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book) => void; }) 
                             onAddToCart={onAddToCart}
                         />
                     )}
+                </div>
+            }
+            {searchError !== undefined &&
+                <div className="search-results-container search-error" role="alert">
+                    {api.apiErrorMessage(searchError)}
                 </div>
             }
         </form>

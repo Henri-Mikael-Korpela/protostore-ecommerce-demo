@@ -704,12 +704,21 @@ type TypeScope = {
 export function javaToDeclaration(source: string, context: GenerationContext): string {
     const { packageName, imports, declarations } = new Parser(tokenize(source)).parseFile();
     const references = new Map<string, string>();
-    const localTypes = new Set(declarations.map(declaration => declaration.name));
+    const localTypes = new Set<string>();
+    for (const declaration of declarations) {
+        localTypes.add(declaration.name);
+    }
 
-    const bodies = declarations.map(declaration => {
+    const bodies: string[] = [];
+    for (const declaration of declarations) {
         if (declaration.kind === "enum") {
-            const union = declaration.constants.map(constant => JSON.stringify(constant)).join(" | ");
-            return `export type ${declaration.name} = ${union || "never"};\n`;
+            const constants: string[] = [];
+            for (const constant of declaration.constants) {
+                constants.push(JSON.stringify(constant));
+            }
+            const union = constants.join(" | ");
+            bodies.push(`export type ${declaration.name} = ${union || "never"};\n`);
+            continue;
         }
         const scope: TypeScope = {
             typeParams: new Set(declaration.typeParams),
@@ -720,19 +729,32 @@ export function javaToDeclaration(source: string, context: GenerationContext): s
             context,
         };
         const params = declaration.typeParams.length > 0 ? `<${declaration.typeParams.join(", ")}>` : "";
-        const members = declaration.fields.map(field => {
+        let members = "";
+        for (const field of declaration.fields) {
             const type = toTypeScript(field.type, scope);
-            return `    ${field.name}: ${type}${field.nullable ? " | null" : ""};\n`;
-        });
-        return `export type ${declaration.name}${params} = {\n${members.join("")}};\n`;
-    });
+            members += `    ${field.name}: ${type}${field.nullable ? " | null" : ""};\n`;
+        }
+        bodies.push(`export type ${declaration.name}${params} = {\n${members}};\n`);
+    }
 
+    // The references are collected while the bodies above are generated, so the imports come last
     const header = `// Generated from ${context.displayPath}. Do not edit.\n`;
-    const importLines = [...references]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([name, from]) => `import type { ${name} } from ${JSON.stringify(from)};\n`)
-        .join("");
-    return [header, importLines, bodies.join("\n")].filter(Boolean).join("\n");
+    const sortedReferences = [...references].sort(([a], [b]) => a.localeCompare(b));
+    let importLines = "";
+    for (const [name, from] of sortedReferences) {
+        importLines += `import type { ${name} } from ${JSON.stringify(from)};\n`;
+    }
+    const body = bodies.join("\n");
+
+    const sections = [header];
+    if (importLines) {
+        sections.push(importLines);
+    }
+    if (body) {
+        sections.push(body);
+    }
+
+    return sections.join("\n");
 }
 
 function toTypeScript(type: JavaType, scope: TypeScope): string {
@@ -745,7 +767,10 @@ function toTypeScript(type: JavaType, scope: TypeScope): string {
     }
 
     const simpleName = type.name.split(".").pop()!;
-    const args = type.args.map(arg => toTypeScript(arg, scope));
+    const args: string[] = [];
+    for (const arg of type.args) {
+        args.push(toTypeScript(arg, scope));
+    }
 
     if (scope.typeParams.has(type.name)) {
         return type.name;
@@ -802,9 +827,17 @@ function resolveReference(name: string, scope: TypeScope): string | null {
     if (name.includes(".")) {
         candidates.push(name);
     } else {
-        candidates.push(...scope.imports.filter(i => i.endsWith(`.${name}`)));
+        for (const importName of scope.imports) {
+            if (importName.endsWith(`.${name}`)) {
+                candidates.push(importName);
+            }
+        }
         candidates.push(scope.packageName ? `${scope.packageName}.${name}` : name);
-        candidates.push(...scope.imports.filter(i => i.endsWith(".*")).map(i => `${i.slice(0, -1)}${name}`));
+        for (const importName of scope.imports) {
+            if (importName.endsWith(".*")) {
+                candidates.push(`${importName.slice(0, -1)}${name}`);
+            }
+        }
     }
 
     const { javaRoot, javaFile } = scope.context;
@@ -814,11 +847,10 @@ function resolveReference(name: string, scope: TypeScope): string | null {
             continue;
         }
         const relativeToRoot = (rootPackage ? candidate.slice(rootPackage.length + 1) : candidate)
-            .split(".")
-            .join(path.sep);
+            .replaceAll(".", path.sep);
         const file = path.join(javaRoot, `${relativeToRoot}.java`);
         if (file !== javaFile && fs.existsSync(file) && declaresType(file, simpleName)) {
-            let from = path.relative(path.dirname(javaFile), file).split(path.sep).join("/");
+            let from = path.relative(path.dirname(javaFile), file).replaceAll(path.sep, "/");
             if (!from.startsWith(".")) {
                 from = `./${from}`;
             }
@@ -834,7 +866,13 @@ function resolveReference(name: string, scope: TypeScope): string | null {
 function declaresType(javaFile: string, name: string): boolean {
     try {
         const { declarations } = new Parser(tokenize(fs.readFileSync(javaFile, "utf8"))).parseFile();
-        return declarations.some(declaration => declaration.name === name);
+        for (const declaration of declarations) {
+            if (declaration.name === name) {
+                return true;
+            }
+        }
+
+        return false;
     } catch {
         return false;
     }
@@ -842,7 +880,18 @@ function declaresType(javaFile: string, name: string): boolean {
 
 /** Derives the Java package that corresponds to `javaRoot`, e.g. `com.prostore`. */
 function packageOfRoot(javaFile: string, packageName: string, javaRoot: string): string {
-    const depth = path.relative(javaRoot, path.dirname(javaFile)).split(path.sep).filter(Boolean).length;
-    const parts = packageName.split(".").filter(Boolean);
+    let depth = 0;
+    for (const segment of path.relative(javaRoot, path.dirname(javaFile)).split(path.sep)) {
+        if (segment) {
+            depth++;
+        }
+    }
+    const parts: string[] = [];
+    for (const part of packageName.split(".")) {
+        if (part) {
+            parts.push(part);
+        }
+    }
+
     return parts.slice(0, parts.length - depth).join(".");
 }

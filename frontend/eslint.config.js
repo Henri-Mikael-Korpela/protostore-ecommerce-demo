@@ -1,7 +1,7 @@
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-// Enforces the "Asynchronous programming and Promises" section of
+// Enforces the "Exception handling" and "Asynchronous programming" sections of
 // docs/typescript-programming-style-guide.md. The rules need type information,
 // so they apply to the TypeScript projects only (not to this config file).
 export default defineConfig(
@@ -31,6 +31,13 @@ export default defineConfig(
             "@typescript-eslint/only-throw-error": "error",
             "@typescript-eslint/prefer-promise-reject-errors": "error",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "error",
+            // Every member of a union, such as every kind of error, must have its own case.
+            // A `default` doesn't count, so adding a member fails until it is handled everywhere.
+            "@typescript-eslint/switch-exhaustiveness-check": ["error", {
+                allowDefaultCaseForExhaustiveSwitch: false,
+                considerDefaultExhaustiveForUnions: false,
+                requireDefaultForNonUnion: true,
+            }],
         },
     },
 );

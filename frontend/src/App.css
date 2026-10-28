@@ -252,6 +252,18 @@
   text-align: center;
 }
 
+.book-page-status-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.search-error {
+  padding: 12px 16px;
+  color: var(--text-h);
+}
+
 .search-input {
   flex: 1;
   padding: 12px 16px;

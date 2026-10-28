@@ -1,3 +1,5 @@
+import { Result } from "./result.ts";
+
 export type UrlOptions = {
     baseUrl: string;
     /** Must already be percent-encoded where it contains user-provided values. */
@@ -7,16 +9,30 @@ export type UrlOptions = {
 };
 
 export function buildUrl(options: UrlOptions): string {
-    let result = options.baseUrl + options.path;
+    const baseUrlAndPath = options.baseUrl + options.path;
 
-    const queryParams = options.queryParams ?? {};
-    if (Object.keys(queryParams).length > 0) {
-        const queryParamEntries: string[] = [];
-        for (const [key, value] of Object.entries(queryParams)) {
-            queryParamEntries.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
-        }
-        result += "?" + queryParamEntries.join("&");
+    const queryParamEntries: string[] = [];
+    for (const [key, value] of Object.entries(options.queryParams ?? {})) {
+        queryParamEntries.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+    }
+    if (queryParamEntries.length === 0) {
+        return baseUrlAndPath;
     }
 
-    return result;
+    return baseUrlAndPath + "?" + queryParamEntries.join("&");
+}
+
+/**
+ * `decodeURIComponent` returning an error value for malformed input such as `%E0`, instead of throwing.
+ */
+export function decodeUriComponent(value: string): Result<string, URIError> {
+    try {
+        return Result.ok(decodeURIComponent(value));
+    } catch (error) {
+        // decodeURIComponent throws only URIError, anything else is a bug
+        if (!(error instanceof URIError)) {
+            throw error;
+        }
+        return Result.err(error);
+    }
 }
