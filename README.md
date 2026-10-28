@@ -176,3 +176,15 @@ I had to switch to Windows as my main operating system. Then I realized Docker d
 Implemented shopping cart functionality. There's no login yet, only guest users.
 
 A guest user is now able to add books to their shopping cart.
+
+## Day 8: Shopping Cart in Local Storage, Some Refactoring, Ensuring Better Code Quality
+
+Integrated local storage as part of the shopping cart. Added nice book animation whenever user adds an item to the shopping cart.
+
+Added book cover preview in the search.
+
+Improved TypeScript rules by adding ESLint, made rules more explicit and ensured better code quality especially when it comes to asynchronous programming and exception handling. Enforced a more strict explicit error handling instead of relying so much on exception handling.
+
+Replaced mock book display on the front page with featured books. Added more books for testing. Added a featured field for determining whether a book is featured or not.
+
+Divide CSS styles into CSS modules so that CSS can be worked on in a modular way.
