@@ -33,7 +33,7 @@ function BookLoadError({ error, onRetry }: { error: ApiError; onRetry: () => voi
             <h1>Could not load the book</h1>
             <p>{api.apiErrorMessage(error)}</p>
             <div className="book-page-status-actions">
-                <button type="button" className="banner-cta" onClick={onRetry}>
+                <button type="button" className="primary-button" onClick={onRetry}>
                     Try again
                 </button>
                 <Link to="/" className="book-page-back">Back to the store</Link>
@@ -55,7 +55,7 @@ function BookDetails({ book, onAddToCart }: { book: Book; onAddToCart: (book: Bo
                     <dd>{book.isbn ?? "Not available"}</dd>
                 </dl>
                 <div className="book-page-actions">
-                    <button type="button" className="banner-cta" onClick={() => onAddToCart(book)}>
+                    <button type="button" className="primary-button" onClick={() => onAddToCart(book)}>
                         Add to cart
                     </button>
                 </div>

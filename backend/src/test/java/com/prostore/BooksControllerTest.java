@@ -38,6 +38,19 @@ class BooksControllerTest {
     }
 
     @Test
+    void getFeaturedBooks_returnsFeaturedBooksFromRepository() throws Exception {
+        var book = new Book();
+        book.setIsbn("9780134685991");
+        book.setTitle("Effective Java");
+        book.setFeatured(true);
+        when(bookRepository.findByFeaturedTrueOrderByTitle()).thenReturn(List.of(book));
+
+        mockMvc.perform(get("/api/books/featured"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Effective Java"));
+    }
+
+    @Test
     void getBook_returnsNotFoundWhenRepositoryHasNoBook() throws Exception {
         var id = UUID.randomUUID();
         when(bookRepository.findById(id)).thenReturn(Optional.empty());

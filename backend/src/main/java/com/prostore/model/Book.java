@@ -18,6 +18,8 @@ public class Book {
 
     private String title;
 
+    private boolean featured;
+
     public UUID getId() { return id; }
 
     public String getIsbn() { return isbn; }
@@ -27,4 +29,8 @@ public class Book {
     public String getTitle() { return title; }
 
     public void setTitle(String value) { title = value; }
+
+    public boolean isFeatured() { return featured; }
+
+    public void setFeatured(boolean value) { featured = value; }
 }

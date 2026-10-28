@@ -103,6 +103,24 @@ class BooksControllerIntegrationTest {
     }
 
     @Test
+    @Sql("/testdata/books-featured.sql")
+    void getFeaturedBooks_returnsOnlyFeaturedBooksOrderedByTitle() throws Exception {
+        mockMvc.perform(get("/api/books/featured"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].title").value("Clean Code"))
+                .andExpect(jsonPath("$[1].title").value("Effective Java"));
+    }
+
+    @Test
+    @Sql("/testdata/books-with-null-isbn.sql")
+    void getFeaturedBooks_returnsNoBooksWhenNoneIsFeatured() throws Exception {
+        mockMvc.perform(get("/api/books/featured"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
     @Sql("/testdata/books-basic.sql")
     void getBook_returnsBookById() throws Exception {
         var book = bookRepository.findAll().stream()

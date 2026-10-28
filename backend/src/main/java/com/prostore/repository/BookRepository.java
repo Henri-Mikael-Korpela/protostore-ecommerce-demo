@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface BookRepository extends JpaRepository<Book, UUID> {
 
+    List<Book> findByFeaturedTrueOrderByTitle();
+
     // websearch_to_tsquery understands natural search syntax (quoted phrases, "or", "-" to exclude) instead of the
     // operator syntax plain to_tsquery needs. Results are ranked by relevance since a query can match many books.
     @Query(

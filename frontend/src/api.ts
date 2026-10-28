@@ -160,6 +160,16 @@ export async function getBooks(search: string): Promise<ApiResult<BookDto[]>> {
 }
 
 /**
+ * Never rejects. Resolves to an empty array when no book is featured.
+ */
+export async function getFeaturedBooks(): Promise<ApiResult<BookDto[]>> {
+    return buildApiRequest({
+        path: "/api/books/featured",
+        validator: arrayOf(isBookDto),
+    });
+}
+
+/**
  * Never rejects. A book that doesn't exist is an `http` error with status 404.
  */
 export async function getBook(id: string): Promise<ApiResult<BookDto>> {

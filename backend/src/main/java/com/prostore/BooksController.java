@@ -33,6 +33,14 @@ public class BooksController {
                 .toArray(BookDto[]::new);
     }
 
+    // A literal path takes precedence over the {id} pattern below, so "featured" is not read as an ID
+    @GetMapping("/api/books/featured")
+    public BookDto[] getFeaturedBooks() {
+        return bookRepository.findByFeaturedTrueOrderByTitle().stream()
+                .map(BooksController::toDto)
+                .toArray(BookDto[]::new);
+    }
+
     @GetMapping("/api/books/{id}")
     public ResponseEntity<BookDto> getBook(@PathVariable UUID id) {
         return bookRepository.findById(id)
