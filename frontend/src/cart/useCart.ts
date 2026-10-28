@@ -1,21 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import {getCartItemsFromLocalStorage, setCartItemsToLocalStorage} from "../local-storage.ts";
 
 export type CartItem = {
     isbn: string;
     title: string;
     quantity: number;
 };
-
-const STORAGE_KEY = "protostore.cart";
-
-function loadCart(): CartItem[] {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) as CartItem[] : [];
-    } catch {
-        return [];
-    }
-}
 
 function withBookAdded(items: CartItem[], book: { isbn: string; title: string }): CartItem[] {
     const result: CartItem[] = [];
@@ -56,14 +46,10 @@ function withIsbnRemoved(items: CartItem[], isbn: string): CartItem[] {
 }
 
 export function useCart() {
-    const [items, setItems] = useState<CartItem[]>(loadCart);
+    const [items, setItems] = useState<CartItem[]>(getCartItemsFromLocalStorage);
 
     useEffect(() => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-        } catch {
-            // Storage unavailable; the cart still works for this session
-        }
+        setCartItemsToLocalStorage(items);
     }, [items]);
 
     const addItem = useCallback((book: { isbn: string; title: string }) => {
