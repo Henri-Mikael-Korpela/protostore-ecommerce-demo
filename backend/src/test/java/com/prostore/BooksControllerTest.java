@@ -1,6 +1,8 @@
 package com.prostore;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.when;
@@ -33,5 +35,14 @@ class BooksControllerTest {
         mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+    @Test
+    void getBook_returnsNotFoundWhenRepositoryHasNoBook() throws Exception {
+        var id = UUID.randomUUID();
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/books/{id}", id))
+                .andExpect(status().isNotFound());
     }
 }

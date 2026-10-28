@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
+
 import {getCartItemsFromLocalStorage, setCartItemsToLocalStorage} from "../local-storage.ts";
 
 export type CartItem = {
-    isbn: string;
+    id: string;
     title: string;
     quantity: number;
 };
 
-function withBookAdded(items: CartItem[], book: { isbn: string; title: string }): CartItem[] {
+function withBookAdded(items: CartItem[], book: { id: string; title: string }): CartItem[] {
     const result: CartItem[] = [];
 
     let found = false;
     for (const item of items) {
-        if (item.isbn === book.isbn) {
+        if (item.id === book.id) {
             result.push({
                 ...item,
                 quantity: item.quantity + 1,
@@ -24,7 +25,7 @@ function withBookAdded(items: CartItem[], book: { isbn: string; title: string })
     }
     if (!found) {
         result.push({
-            isbn: book.isbn,
+            id: book.id,
             title: book.title,
             quantity: 1,
         });
@@ -33,11 +34,11 @@ function withBookAdded(items: CartItem[], book: { isbn: string; title: string })
     return result;
 }
 
-function withIsbnRemoved(items: CartItem[], isbn: string): CartItem[] {
+function withIdRemoved(items: CartItem[], id: string): CartItem[] {
     const result: CartItem[] = [];
 
     for (const item of items) {
-        if (item.isbn !== isbn) {
+        if (item.id !== id) {
             result.push(item);
         }
     }
@@ -52,12 +53,12 @@ export function useCart() {
         setCartItemsToLocalStorage(items);
     }, [items]);
 
-    const addItem = useCallback((book: { isbn: string; title: string }) => {
+    const addItem = useCallback((book: { id: string; title: string }) => {
         setItems(current => withBookAdded(current, book));
     }, []);
 
-    const removeItem = useCallback((isbn: string) => {
-        setItems(current => withIsbnRemoved(current, isbn));
+    const removeItem = useCallback((id: string) => {
+        setItems(current => withIdRemoved(current, id));
     }, []);
 
     let itemCount = 0;

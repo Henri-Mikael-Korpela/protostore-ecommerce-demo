@@ -1,47 +1,34 @@
 import { type BookDto } from "@protostore/dto/BookDto.java";
 // Type-only self-import, used to derive endpoint names from this module's exports
 import type * as api from "./api.ts";
+import { buildUrl, type UrlOptions } from "./url.ts";
 
-type RequestOptions = {
-    path: string;
-    queryParams?: Record<string, string>;
-};
-
-type Request<HeaderT extends Record<string, string> = Record<string, string>> = RequestOptions & {
+type Request<HeaderT extends Record<string, string> = Record<string, string>> = Omit<UrlOptions, "baseUrl"> & {
     headers?: HeaderT;
 }
 
 const BASE_URL = "http://localhost:8080";
 
-function buildApiRequest<ResponseSuccess, HeaderT extends Record<string, string> = Record<string, string>>(
+async function buildApiRequest<ResponseSuccess, HeaderT extends Record<string, string> = Record<string, string>>(
     request: Request<HeaderT>
-): Promise<ResponseSuccess> {
-    const uri = buildApiRequestURI({
+): Promise<ResponseSuccess | undefined> {
+    let result: ResponseSuccess | undefined;
+
+    const uri = buildUrl({
+        baseUrl: BASE_URL,
         path: request.path,
         queryParams: request.queryParams,
     });
-    return fetch(uri, {
-        headers: request.headers,
-    })
-        .then(async (value: Response) => {
-            if (request.headers?.["Content-Type"] === "application/json") {
-                return await value.json() as ResponseSuccess;
-            }
-            throw "Unimplemented yet";
-        })
-        // TODO: Better approach to error handling
-        .catch(() => undefined);
-}
-
-function buildApiRequestURI(request: RequestOptions): string {
-    let result = BASE_URL + request.path;
-
-    if (Object.keys(request.queryParams).length > 0) {
-        const queryParamEntries: string[] = [];
-        for (const [key, value] of Object.entries(request.queryParams)) {
-            queryParamEntries.push(`${key}=${value}`);
+    try {
+        const response = await fetch(uri, {
+            headers: request.headers,
+        });
+        // Only JSON responses are supported yet
+        if (response.ok && request.headers?.["Content-Type"] === "application/json") {
+            result = await response.json() as ResponseSuccess;
         }
-        result += "?" + queryParamEntries.join("&");
+    } catch {
+        // TODO: Better approach to error handling
     }
 
     return result;
@@ -61,17 +48,29 @@ export type EndpointResponseAwaited<N extends EndpointName> = Awaited<ReturnType
 /// Project specific API endpoints
 
 export async function getBooks(search: string): Promise<BookDto[]> {
-    try {
-        return await buildApiRequest({
-            headers: {
-                "Content-Type": "application/json",
-            },
-            path: "/api/books",
-            queryParams: {
-                search,
-            },
-        });
-    } catch {
-        return [];
-    }
+    const books = await buildApiRequest<BookDto[]>({
+        headers: {
+            "Content-Type": "application/json",
+        },
+        path: "/api/books",
+        queryParams: {
+            search,
+        },
+    });
+
+    return books ?? [];
+}
+
+/**
+ * Resolves to `null` when the book does not exist or the request fails.
+ */
+export async function getBook(id: string): Promise<BookDto | null> {
+    const book = await buildApiRequest<BookDto>({
+        headers: {
+            "Content-Type": "application/json",
+        },
+        path: `/api/books/${encodeURIComponent(id)}`,
+    });
+
+    return book ?? null;
 }

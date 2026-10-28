@@ -1,10 +1,11 @@
 import { useState } from 'react';
+
 import type { CartItem } from "./useCart.ts";
 
 export function Cart({ items, itemCount, onRemove }: {
     items: CartItem[];
     itemCount: number;
-    onRemove: (isbn: string) => void;
+    onRemove: (id: string) => void;
 }) {
     const [open, setOpen] = useState(false);
 
@@ -25,14 +26,14 @@ export function Cart({ items, itemCount, onRemove }: {
                     {items.length === 0
                         ? <p className="cart-empty">Your cart is empty.</p>
                         : items.map(item =>
-                            <div key={item.isbn} className="cart-item">
+                            <div key={item.id} className="cart-item">
                                 <span className="cart-item-title">{item.title}</span>
                                 <span className="cart-item-quantity">×{item.quantity}</span>
                                 <button
                                     type="button"
                                     className="cart-item-remove"
                                     aria-label={`Remove ${item.title} from cart`}
-                                    onClick={() => onRemove(item.isbn)}
+                                    onClick={() => onRemove(item.id)}
                                 >
                                     ✕
                                 </button>

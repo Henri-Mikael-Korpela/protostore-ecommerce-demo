@@ -1,5 +1,8 @@
 package com.prostore;
 
+import java.util.UUID;
+
+import com.prostore.repository.BookRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,6 +34,9 @@ class BooksControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private BookRepository bookRepository;
 
     @Test
     @Sql("/testdata/books-basic.sql")
@@ -94,6 +100,28 @@ class BooksControllerIntegrationTest {
                                 "Effective Java"
                         )
                 ));
+    }
+
+    @Test
+    @Sql("/testdata/books-basic.sql")
+    void getBook_returnsBookById() throws Exception {
+        var book = bookRepository.findAll().stream()
+                .filter(candidate -> candidate.getTitle().equals("Effective Java"))
+                .findFirst()
+                .orElseThrow();
+
+        mockMvc.perform(get("/api/books/{id}", book.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(book.getId().toString()))
+                .andExpect(jsonPath("$.isbn").value("9780134685991"))
+                .andExpect(jsonPath("$.title").value("Effective Java"));
+    }
+
+    @Test
+    @Sql("/testdata/books-basic.sql")
+    void getBook_returnsNotFoundWhenIdDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/books/{id}", UUID.randomUUID()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
