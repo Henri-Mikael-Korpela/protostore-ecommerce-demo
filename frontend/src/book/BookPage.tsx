@@ -22,7 +22,7 @@ export function BookPage({ bookId, onAddToCart }: { bookId: string; onAddToCart:
         }
 
         setBook(undefined);
-        load();
+        void load();
 
         return () => {
             ignore = true;

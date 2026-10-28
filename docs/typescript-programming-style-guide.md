@@ -35,6 +35,20 @@ Each of these sections should be separated by an empty line.
 - Use `undefined` for logic that stays in the TypeScript code:
   - For optional parameters and properties.
 
+## Exception handling
+
+- Avoid exception handling whenever possible. Prefer errors as values.
+- Only throw and reject with `Error` objects, so that a stack trace is preserved. Pass the original error as `cause` when wrapping it: `new Error("message", { cause: error })`.
+- Treat caught errors as `unknown` and narrow their type before use.
+
+## Asynchronous programming
+
+- Use `async`/`await` instead of `.then()` and `.catch()` chains.
+- Handle every promise: await it, return it, or mark it explicitly ignored with the `void` operator.
+- Use `void` only for a promise of an async function that handles its own errors and never rejects. Document that it never rejects in the function's doc comment.
+- Inside a `try` block, use `return await` instead of `return` when returning a promise, so its rejection is caught by the `catch` block.
+- In effects, ignore results of asynchronous work that finishes after the effect is cleaned up, so outdated results don't overwrite newer ones.
+
 ## React Components
 
 - Use function components only, never class components.

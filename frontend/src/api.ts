@@ -9,6 +9,9 @@ type Request<HeaderT extends Record<string, string> = Record<string, string>> = 
 
 const BASE_URL = "http://localhost:8080";
 
+/**
+ * Never rejects. Resolves to `undefined` when the request fails or the response is not successful.
+ */
 async function buildApiRequest<ResponseSuccess, HeaderT extends Record<string, string> = Record<string, string>>(
     request: Request<HeaderT>
 ): Promise<ResponseSuccess | undefined> {
@@ -47,6 +50,9 @@ export type EndpointResponseAwaited<N extends EndpointName> = Awaited<ReturnType
 
 /// Project specific API endpoints
 
+/**
+ * Never rejects. Resolves to an empty array when the request fails.
+ */
 export async function getBooks(search: string): Promise<BookDto[]> {
     const books = await buildApiRequest<BookDto[]>({
         headers: {
@@ -62,7 +68,7 @@ export async function getBooks(search: string): Promise<BookDto[]> {
 }
 
 /**
- * Resolves to `null` when the book does not exist or the request fails.
+ * Never rejects. Resolves to `null` when the book does not exist or the request fails.
  */
 export async function getBook(id: string): Promise<BookDto | null> {
     const book = await buildApiRequest<BookDto>({

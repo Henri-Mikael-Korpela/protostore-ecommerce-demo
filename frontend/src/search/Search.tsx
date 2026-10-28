@@ -60,7 +60,7 @@ export function Search({ onAddToCart }: { onAddToCart: (book: Book) => void; }) 
             return;
         }
 
-        (async () => {
+        void (async () => {
             const result = await api.getBooks(searchQuery);
             if (!ignore) {
                 setBooks(result);

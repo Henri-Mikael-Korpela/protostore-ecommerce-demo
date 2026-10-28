@@ -41,7 +41,9 @@ export function javaDto(options: JavaDtoPluginOptions): Plugin {
                 displayPath: path.relative(process.cwd(), javaFile),
             });
         } catch (error) {
-            throw new Error(`Failed to parse ${javaFile}: ${(error as Error).message}`);
+            throw new Error(`Failed to parse ${javaFile}: ${errorMessage(error)}`, {
+                cause: error,
+            });
         }
         fs.mkdirSync(path.dirname(target), {
             recursive: true,
@@ -108,7 +110,7 @@ export function javaDto(options: JavaDtoPluginOptions): Plugin {
                 try {
                     generate(file);
                 } catch (error) {
-                    server.config.logger.error((error as Error).message);
+                    server.config.logger.error(errorMessage(error));
                 }
             };
             server.watcher.on("add", onChange);
@@ -120,6 +122,10 @@ export function javaDto(options: JavaDtoPluginOptions): Plugin {
             });
         },
     };
+}
+
+function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
 }
 
 function isInside(directory: string, file: string): boolean {
