@@ -38,6 +38,14 @@
   }
 }
 
+/* The SVG is used as a mask so the icon follows the text color in light and dark mode */
+.cart-icon {
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  mask: url("./assets/cart.svg") center / contain no-repeat;
+}
+
 .cart-badge {
   position: absolute;
   top: 0;
